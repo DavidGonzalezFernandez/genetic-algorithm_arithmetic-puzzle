@@ -3,14 +3,14 @@ This repository contains code for applying a genetic algorithm metaheuristic to 
 
 ## Example
 Given the numbers: $25$, $6$, $9$, $75$, $50$, and $3$.
-The sequence of operators "+ * + - +" would be interpreted as:
+The sequence of operators "+ * + - +" would be interpreted as:  
 $25 + 6 = 31$  
 $31 * 9 = 279$  
 $279 + 75 = 354$  
 $354 - 50 = 304$  
 $304 + 3 = 307$  
 
-The sequence of operators "- - + + *" would be interpreted as:
+The sequence of operators "- - + + *" would be interpreted as:  
 $25 - 6 = 19$  
 $19 - 9 = 10$  
 $10 + 75 = 85$  
