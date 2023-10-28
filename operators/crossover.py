@@ -35,3 +35,14 @@ class OnePointCrossOver(CrossoverOperator):
         assert len(children[0].get_operators()) == len(children[1].get_operators())
 
         return children
+    
+class KPointCrossOver(CrossoverOperator):
+    @staticmethod
+    def crossover(parent1: Sequence, parent2: Sequence, p1: float=0.5) -> List[Sequence]:
+        pass
+
+
+class UniformCrossover(CrossoverOperator):
+    @staticmethod
+    def crossover(parent1: Sequence, parent2: Sequence, p1: float=0.5) -> List[Sequence]:
+        pass

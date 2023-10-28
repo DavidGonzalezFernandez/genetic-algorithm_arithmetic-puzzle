@@ -50,3 +50,29 @@ class TournamentSelection(SelectionOperator):
             )
         
         return selected_population
+
+
+class RouletteWheelSelection(SelectionOperator):
+    @staticmethod
+    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
+        # TODO
+        pass
+
+
+class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
+    @staticmethod
+    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
+        # TODO
+        pass
+
+class StochasticUniversalSampling(SelectionOperator):
+    @staticmethod
+    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
+        # TODO
+        pass
+
+class RankSelection(SelectionOperator):
+    @staticmethod
+    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
+        # TODO
+        pass
