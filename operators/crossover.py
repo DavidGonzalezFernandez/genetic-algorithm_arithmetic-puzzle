@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from ..sequence import Sequence
+from sequence import Sequence
 from typing import List
 
 """Strategy interface for all crossover operators"""

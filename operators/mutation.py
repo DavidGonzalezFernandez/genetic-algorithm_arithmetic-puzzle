@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from ..sequence import Sequence
+from sequence import Sequence
 
 """Strategy interface for all mutation operators"""
 class MutationOperator(ABC):
