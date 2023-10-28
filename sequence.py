@@ -30,3 +30,11 @@ class Sequence:
 
     def get_fitness_value(self):
         return self.fitness_value
+    
+    def __lt__(self, other):
+        assert isinstance(other, Sequence)
+        return self.get_fitness_value() < other.get_fitness_value()
+
+    def __gt__(self, other):
+        assert isinstance(other, Sequence)
+        return self.get_fitness_value() > other.get_fitness_value()
