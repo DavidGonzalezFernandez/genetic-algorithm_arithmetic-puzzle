@@ -16,28 +16,39 @@ selection_method: SelectionOperator = operators.selection.TournamentSelection
 def fitness_function(sequence: Sequence):
     return abs(sequence.get_value() - TARGET_VALUE)
 
+def evaluate_population(population: List[Sequence]) -> None:
+    for elem in population:
+        elem.calculate_value(VALUES)
+        elem.set_fitness_value(fitness_function(elem))
+
 def generate_population() -> List[Sequence]:
     operators_per_sequence = len(VALUES)-1
     
     population: List[Sequence]  = [
         Sequence(
-            [random.choice(ARITHMETIC_OPERATORS) for j in range(operators_per_sequence)],
-            VALUES,
-            fitness_function
+            [random.choice(ARITHMETIC_OPERATORS) for j in range(operators_per_sequence)]
         ) for i in range(POPULATION_SIZE)
     ]
 
     return population
 
 def main():
+    # Generate the initial population
     population: List[Sequence] = generate_population()
 
+    # Evaluate the initial population
+    evaluate_population(population)
+
     while True: # TODO select stopping criterion
+        # Reproduce (select) the best solutions within the population
         selected_population = selection_method.select(population, MINIMIZE)
-        break
+
         # TODO Crossover between chosen parents (crossover)
+
+
         # TODO Mutate generated children (mutation)
-        pass
+        
+        break
 
 if __name__ == "__main__":
     main()

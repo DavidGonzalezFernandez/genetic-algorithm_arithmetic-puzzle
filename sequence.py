@@ -1,5 +1,5 @@
 ARITHMETIC_OPERATORS = ["+", "-", "*", "/"]
-from typing import List
+from typing import List, Optional
 
 def calculate_operation_result(
         operators: List[str], 
@@ -15,21 +15,31 @@ def calculate_operation_result(
     return res
 
 class Sequence:
-    def __init__(
-            self,
-            operators: List[str],
-            values: List[int],
-            fitness_function
-        ):
+    def __init__(self, operators: List[str]):
         self.operators = operators
-        self.value = calculate_operation_result(operators, values)
-        self.fitness_value = fitness_function(self)
+        self.value: Optional[float] = None
+        self.fitness_value: Optional[float] = None
+    
+    def calculate_value(self, values: List[int]) -> None:
+        self.value = calculate_operation_result(self.operators, values)
+        assert self.value is not None
 
-    def get_value(self):
+    def set_fitness_value(self, new_fitness_value: float) -> None:
+        assert new_fitness_value is not None
+        self.fitness_value = new_fitness_value
+
+    def get_value(self) -> float:
+        if self.value is None:
+            raise ValueError()
         return self.value
 
-    def get_fitness_value(self):
+    def get_fitness_value(self) -> float:
+        if self.fitness_value is None:
+            raise ValueError()
         return self.fitness_value
+    
+    def get_operators(self) -> List[str]:
+        return self.operators.copy()
     
     def __lt__(self, other):
         assert isinstance(other, Sequence)
