@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from sequence import Sequence
-from typing import List
+from typing import List, Optional
 import random
 
 
@@ -54,9 +54,38 @@ class TournamentSelection(SelectionOperator):
 
 class RouletteWheelSelection(SelectionOperator):
     @staticmethod
-    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
-        # TODO
-        pass
+    def select(population: List[Sequence], minimize: bool, alternative_fitness: Optional[List[float]] = None, new_size: Optional[int] = None) -> List[Sequence]:
+        if alternative_fitness is None:
+            fitness_values = {i:individual.get_fitness_value() for (i,individual) in enumerate(population)}
+        else:
+            fitness_values = {i:fitness_value for (i,fitness_value) in enumerate(alternative_fitness)}
+
+        sum_fitness = sum(fitness_values.values())
+
+        if minimize:
+            probabilities = {key:sum_fitness/value for (key,value) in fitness_values.items()}
+        else:
+            probabilities = {key:value/sum_fitness for (key,value) in fitness_values.items()}
+            assert sum(probabilities) == 1
+
+        accumulator = 0
+        accum_probabilities = {}
+        for (key,value) in probabilities.items():
+            accum_probabilities[key] = value+accumulator
+            accumulator += value
+        
+        if new_size is None:
+            new_size = len(population)
+
+        selected = []
+        for i in range(new_size):
+            p = random.random()*accumulator
+            assert p>=0  and  p<=accumulator
+            selected.append(population[[k for (k,v) in accum_probabilities.items() if v>=p][0]])
+        
+        assert len(selected) == len(population)
+
+        return selected
 
 
 class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
