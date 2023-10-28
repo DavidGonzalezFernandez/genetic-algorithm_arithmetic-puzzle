@@ -16,7 +16,7 @@ def calculate_operation_result(
 
 class Sequence:
     def __init__(self, operators: List[str]):
-        self.operators = operators
+        self.operators = operators.copy()
         self.value: Optional[float] = None
         self.fitness_value: Optional[float] = None
     
@@ -27,6 +27,10 @@ class Sequence:
     def set_fitness_value(self, new_fitness_value: float) -> None:
         assert new_fitness_value is not None
         self.fitness_value = new_fitness_value
+
+    def set_new_operators(self, operators: List[str]):
+        assert operators is not None
+        self.operators = operators
 
     def get_value(self) -> float:
         if self.value is None:

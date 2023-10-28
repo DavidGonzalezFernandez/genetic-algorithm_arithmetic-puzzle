@@ -3,6 +3,7 @@ from sequence import Sequence, ARITHMETIC_OPERATORS
 import operators.crossover
 from operators.crossover import CrossoverOperator
 import operators.mutation
+from operators.mutation import MutationOperator
 import operators.selection
 from operators.selection import SelectionOperator
 import random
@@ -12,9 +13,12 @@ POPULATION_SIZE = (len(VALUES)-1) * 2
 TARGET_VALUE = 852
 MINIMIZE = True
 CROSSOVER_P1 = 0.5
+MUTATION_P = 0.1
+MAX_ITERATIONS = 100
 
 selection_method: SelectionOperator = operators.selection.TournamentSelection
 crossover_operator: CrossoverOperator = operators.crossover.OnePointCrossOver
+mutation_operator: MutationOperator = operators.mutation.StringMutation
 
 def fitness_function(sequence: Sequence):
     return abs(sequence.get_value() - TARGET_VALUE)
@@ -35,8 +39,9 @@ def generate_population() -> List[Sequence]:
 
     return population
 
-def do_crossover(the_population: List[Sequence]):
-    offspring = []
+
+def do_crossover(the_population: List[Sequence]) -> List[Sequence]:
+    offspring: List[Sequence] = []
 
     while len(the_population) >= 2:
         parent1 = the_population.pop()
@@ -48,6 +53,11 @@ def do_crossover(the_population: List[Sequence]):
         offspring.append(parent1)
     
     return offspring
+
+
+def mutate_population(the_population: List[Sequence]) -> None:
+    for individual in the_population:
+        mutation_operator.mutate(individual, MUTATION_P)
     
 
 def main():
@@ -57,16 +67,25 @@ def main():
     # Evaluate the initial population
     evaluate_population(population)
 
-    while True: # TODO select stopping criterion
+    n_generation = 0
+
+    while n_generation<MAX_ITERATIONS  and  not any(individual.get_fitness_value()==0 for individual in population):
         # Reproduce (select) the best solutions within the population
-        selected_population = selection_method.select(population, MINIMIZE)
+        selected_population: List[Sequence] = selection_method.select(population, MINIMIZE)
 
         # Crossover between the best solutions chosen (parents)
-        do_crossover(selected_population.copy())
+        offspring: List[Sequence] = do_crossover(selected_population.copy())
 
-        # TODO Mutate generated children (mutation)
+        # Mutate generated children
+        mutate_population(offspring)
+
+        # Update population list
+        population = offspring
+        n_generation += 1
+
+        # Evaluate the new population fitness
+        evaluate_population(population)
+
         
-        break
-
 if __name__ == "__main__":
     main()
