@@ -1,13 +1,14 @@
 from typing import List
-from individual import Individual
-from sequence import Sequence, ARITHMETIC_OPERATORS
+from individual import Individual, IndividualEvaluator
+import sequence.sequence_generator
+import sequence.sequence_evaluator
 import operators.crossover
 from operators.crossover import CrossoverOperator
 import operators.mutation
 from operators.mutation import MutationOperator
 import operators.selection
 from operators.selection import SelectionOperator
-import random
+from population import PopulationGenerator
 
 VALUES = [75, 3, 1, 4, 50, 6, 12, 8]
 POPULATION_SIZE = (len(VALUES)-1) * 2
@@ -17,33 +18,20 @@ CROSSOVER_P1 = 0.5
 MUTATION_P = 0.1
 MAX_ITERATIONS = 100
 
-selection_method: SelectionOperator = operators.selection.RankSelection
+population_generator: PopulationGenerator = sequence.sequence_generator.RandomSequencePopulationGenerator
+individual_evaluator: IndividualEvaluator = sequence.sequence_evaluator.SequenceEvaluator(TARGET_VALUE, VALUES)
+selection_method: SelectionOperator = operators.selection.TournamentSelection
 crossover_operator: CrossoverOperator = operators.crossover.OnePointCrossOver
 mutation_operator: MutationOperator = operators.mutation.StringMutation
 
-# TODO: decouple
-def fitness_function(individual: Sequence):
-    return abs(individual.get_value() - TARGET_VALUE)
 
-# TODO: decouple
-def evaluate_population(population: List[Sequence]) -> None:
-    for elem in population:
-        elem.calculate_value(VALUES)
-        elem.set_fitness_value(fitness_function(elem))
-
-# TODO: decouple
-def generate_population() -> List[Sequence]:
-    operators_per_sequence = len(VALUES)-1
-    
-    population: List[Sequence]  = [
-        Sequence(
-            [random.choice(ARITHMETIC_OPERATORS) for j in range(operators_per_sequence)]
-        ) for i in range(POPULATION_SIZE)
-    ]
-
-    return population
+"""Loops over the population and calls the appropriate evaluaton"""
+def evaluate_population(population: List[Individual]) -> None:
+    for individual in population:
+        individual_evaluator.evaluate_individual(individual)
 
 
+"""Loops over the the population and breeds the individuals"""
 def do_crossover(the_population: List[Individual]) -> List[Individual]:
     offspring: List[Individual] = []
 
@@ -59,14 +47,16 @@ def do_crossover(the_population: List[Individual]) -> List[Individual]:
     return offspring
 
 
+"""Loops over the population and mutates the individuals. It modifies the objects"""
 def mutate_population(the_population: List[Individual]) -> None:
     for individual in the_population:
         mutation_operator.mutate(individual, MUTATION_P)
     
 
+"""General structure for a genetic algorithm"""
 def main():
     # Generate the initial population
-    population: List[Individual] = generate_population()
+    population: List[Individual] = population_generator.generate(len(VALUES)-1, POPULATION_SIZE)
 
     # Evaluate the initial population
     evaluate_population(population)

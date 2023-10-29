@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractstaticmethod
 from individual import Individual
 from typing import List, Optional, Dict
 import random
@@ -6,7 +6,7 @@ import random
 
 """Strategy interface for all selection operators"""
 class SelectionOperator(ABC):
-    @abstractmethod
+    @abstractstaticmethod
     def select(self, population: List[Individual], minimize: bool) -> List[Individual]:
         raise NotImplemented()
 

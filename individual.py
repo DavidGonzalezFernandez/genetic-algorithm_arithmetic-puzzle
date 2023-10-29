@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-"""Interface for individuals"""
+
+"""Prototype interface for individuals"""
 class Individual(ABC):
     def __init__(self, gene_list):
         self.gene_list: list = gene_list.copy()
@@ -31,3 +32,14 @@ class Individual(ABC):
     def __gt__(self, other) -> bool:
         assert isinstance(other, Individual)
         return self.get_fitness_value() > other.get_fitness_value()
+    
+    @abstractmethod
+    def clone(self, gene_list):
+        raise NotImplemented()
+
+
+"""Interface for population evaluator"""
+class IndividualEvaluator(ABC):
+    @abstractmethod
+    def evaluate_individual(individual: Individual) -> None:
+        raise NotImplemented()

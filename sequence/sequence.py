@@ -15,6 +15,8 @@ def calculate_operation_result(
     
     return res
 
+
+"""Implements the Individual prototype interface"""
 class Sequence(Individual):
     def __init__(self, operator_list: List[str]):
         super().__init__(operator_list)
@@ -32,3 +34,6 @@ class Sequence(Individual):
         if self.value is None:
             raise ValueError("There is no value")
         return self.value
+
+    def clone(self, operator_list):
+        return Sequence(operator_list)
