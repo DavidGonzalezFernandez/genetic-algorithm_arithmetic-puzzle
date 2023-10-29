@@ -14,9 +14,7 @@ class CrossoverOperator(ABC):
 class OnePointCrossOver(CrossoverOperator):
     @staticmethod
     def crossover(parent1: Sequence, parent2: Sequence, p1: float=0.5) -> List[Sequence]:
-        operators1 = parent1.get_operators()
-        operators2 = parent2.get_operators()
-
+        operators1, operators2 = parent1.get_operators(), parent2.get_operators()
         assert len(operators1) == len(operators2)
 
         crossover_point = random.randint(0, len(operators1))
@@ -36,13 +34,43 @@ class OnePointCrossOver(CrossoverOperator):
 
         return children
     
-class KPointCrossOver(CrossoverOperator):
+class TwoPointCrossOver(CrossoverOperator):
     @staticmethod
     def crossover(parent1: Sequence, parent2: Sequence, p1: float=0.5) -> List[Sequence]:
-        pass
+        child1, child2 = OnePointCrossOver.crossover(parent1, parent2, p1)
+
+        # If the new crossover point is the same as before, no change is made.
+        # If it is a different value, then a 2-point crossover is made.
+
+        children = OnePointCrossOver.crossover(child1, child2, p1)
+
+        return children
 
 
 class UniformCrossover(CrossoverOperator):
     @staticmethod
     def crossover(parent1: Sequence, parent2: Sequence, p1: float=0.5) -> List[Sequence]:
-        pass
+        operators1, operators2 = parent1.get_operators(), parent2.get_operators()
+        assert len(operators1) == len(operators2)
+
+        new_operators1: List[str] = []
+        new_operators2: List[str] = []
+        probability_threshold: float = 0.5
+
+        for (op1, op2) in zip(operators1, operators2):
+            p: float = random.random()
+
+            if p > probability_threshold:
+                new_operators1.append(op2)
+                new_operators2.append(op1)
+            else:
+                new_operators1.append(op1)
+                new_operators2.append(op2)
+
+        assert len(new_operators1) == len(new_operators2) == len(operators1) == len(operators2)
+         
+        children: List[Sequence] = [Sequence(new_operators1), Sequence(new_operators2)]
+        assert len(children) == 2
+        assert len(children[0].get_operators()) == len(children[1].get_operators())
+
+        return children
