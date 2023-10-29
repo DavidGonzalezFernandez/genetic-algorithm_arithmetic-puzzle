@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from sequence import Sequence
-from typing import List, Optional
+from typing import List, Optional, Dict
 import random
 
 
@@ -54,36 +54,58 @@ class TournamentSelection(SelectionOperator):
 
 class RouletteWheelSelection(SelectionOperator):
     @staticmethod
-    def select(population: List[Sequence], minimize: bool, alternative_fitness: Optional[List[float]] = None, new_size: Optional[int] = None) -> List[Sequence]:
+    def __get_fitness_value_list(population: List[Sequence], alternative_fitness: Optional[List[float]] = None) -> Dict[int, float]:
         if alternative_fitness is None:
-            fitness_values = {i:individual.get_fitness_value() for (i,individual) in enumerate(population)}
+            return {i:individual.get_fitness_value() for (i,individual) in enumerate(population)}
         else:
-            fitness_values = {i:fitness_value for (i,fitness_value) in enumerate(alternative_fitness)}
-
+            return {i:fitness_value for (i,fitness_value) in enumerate(alternative_fitness)}
+    
+    @staticmethod
+    def __get_probabilities(fitness_values: Dict[int, float], minimize: bool) -> Dict[int, float]:
         sum_fitness = sum(fitness_values.values())
 
         if minimize:
-            probabilities = {key:sum_fitness/value for (key,value) in fitness_values.items()}
+            return {key:sum_fitness/value for (key,value) in fitness_values.items()}
         else:
-            probabilities = {key:value/sum_fitness for (key,value) in fitness_values.items()}
-            assert sum(probabilities) == 1
-
+            return {key:value/sum_fitness for (key,value) in fitness_values.items()}
+            # TODO test assert sum(probabilities.values()) == 1
+        
+    @staticmethod
+    def __get_cumulative_probabilities(probabilities: Dict[int, float]) -> Dict[int, float]:
         accumulator = 0
-        accum_probabilities = {}
+        cumulative_probabilities = {}
         for (key,value) in probabilities.items():
-            accum_probabilities[key] = value+accumulator
+            cumulative_probabilities[key] = value+accumulator
             accumulator += value
         
-        if new_size is None:
-            new_size = len(population)
+        return cumulative_probabilities
+    
+    @staticmethod
+    def __turn_wheel(population, selection_size, cumulative_probabilities, sum_probabilities) -> List[Sequence]:
+        selected: List[Sequence] = []
 
-        selected = []
-        for i in range(new_size):
-            p = random.random()*accumulator
-            assert p>=0  and  p<=accumulator
-            selected.append(population[[k for (k,v) in accum_probabilities.items() if v>=p][0]])
+        for i in range(selection_size):
+            p = random.random()*sum_probabilities
+            assert p>=0  and  p<=sum_probabilities
+            selected.append(population[[k for (k,v) in cumulative_probabilities.items() if v>=p][0]])
         
-        assert len(selected) == len(population)
+        assert len(selected) == selection_size
+
+        return selected
+
+
+    @staticmethod
+    def select(population: List[Sequence], minimize: bool, alternative_fitness: Optional[List[float]] = None, new_size: Optional[int] = None) -> List[Sequence]:
+        fitness_values: Dict[int, float] = RouletteWheelSelection.__get_fitness_value_list(population, alternative_fitness)
+        probabilities: Dict[int, float] = RouletteWheelSelection.__get_probabilities(fitness_values, minimize)
+        cumulative_probabilities: Dict[int, float] = RouletteWheelSelection.__get_cumulative_probabilities(probabilities)
+
+        selected: List[Sequence] = RouletteWheelSelection.__turn_wheel(
+            population,
+            new_size if new_size is not None else len(population),
+            cumulative_probabilities,
+            sum(probabilities.values())    
+        )
 
         return selected
 
