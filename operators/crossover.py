@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from sequence import Sequence
+from individual import Individual
 from typing import List
 import random
 
@@ -7,14 +8,14 @@ import random
 """Strategy interface for all crossover operators"""
 class CrossoverOperator(ABC):
     @abstractmethod
-    def crossover(parent1: Sequence, parent2: Sequence, p1: float) -> List[Sequence]:
+    def crossover(parent1: Individual, parent2: Individual, p1: float) -> List[Individual]:
         raise NotImplemented()
 
 
 class OnePointCrossOver(CrossoverOperator):
     @staticmethod
-    def crossover(parent1: Sequence, parent2: Sequence, p1: float=0.5) -> List[Sequence]:
-        operators1, operators2 = parent1.get_operators(), parent2.get_operators()
+    def crossover(parent1: Individual, parent2: Individual, p1: float=0.5) -> List[Individual]:
+        operators1, operators2 = parent1.get_gene_list(), parent2.get_gene_list()
         assert len(operators1) == len(operators2)
 
         crossover_point = random.randint(0, len(operators1))
@@ -30,13 +31,13 @@ class OnePointCrossOver(CrossoverOperator):
         ]
 
         assert len(children) == 2
-        assert len(children[0].get_operators()) == len(children[1].get_operators())
+        assert len(children[0].get_gene_list()) == len(children[1].get_gene_list())
 
         return children
     
 class TwoPointCrossOver(CrossoverOperator):
     @staticmethod
-    def crossover(parent1: Sequence, parent2: Sequence, p1: float=0.5) -> List[Sequence]:
+    def crossover(parent1: Individual, parent2: Individual, p1: float=0.5) -> List[Individual]:
         child1, child2 = OnePointCrossOver.crossover(parent1, parent2, p1)
 
         # If the new crossover point is the same as before, no change is made.
@@ -49,8 +50,8 @@ class TwoPointCrossOver(CrossoverOperator):
 
 class UniformCrossover(CrossoverOperator):
     @staticmethod
-    def crossover(parent1: Sequence, parent2: Sequence, p1: float=0.5) -> List[Sequence]:
-        operators1, operators2 = parent1.get_operators(), parent2.get_operators()
+    def crossover(parent1: Individual, parent2: Individual, p1: float=0.5) -> List[Individual]:
+        operators1, operators2 = parent1.get_gene_list(), parent2.get_gene_list()
         assert len(operators1) == len(operators2)
 
         new_operators1: List[str] = []
@@ -69,8 +70,8 @@ class UniformCrossover(CrossoverOperator):
 
         assert len(new_operators1) == len(new_operators2) == len(operators1) == len(operators2)
          
-        children: List[Sequence] = [Sequence(new_operators1), Sequence(new_operators2)]
+        children: List[Individual] = [Sequence(new_operators1), Sequence(new_operators2)]
         assert len(children) == 2
-        assert len(children[0].get_operators()) == len(children[1].get_operators())
+        assert len(children[0].get_gene_list()) == len(children[1].get_gene_list())
 
         return children

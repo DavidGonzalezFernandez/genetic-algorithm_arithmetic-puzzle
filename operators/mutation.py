@@ -13,10 +13,10 @@ class MutationOperator(ABC):
 
 class StringMutation(MutationOperator):
     @staticmethod
-    def mutate(individual: Sequence, pm: float) -> None:
-        operators = individual.get_operators()
+    def mutate(individual: Individual, pm: float) -> None:
+        operators = individual.get_gene_list()
         if random.random() <= pm:
             index = random.randint(0, len(operators)-1)
             new_operator = random.choice(ARITHMETIC_OPERATORS)
             operators[index] = new_operator
-            individual.set_new_operators(operators)
+            individual.set_gene_list(operators)

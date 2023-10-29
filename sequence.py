@@ -16,40 +16,19 @@ def calculate_operation_result(
     return res
 
 class Sequence(Individual):
-    def __init__(self, operators: List[str]):
-        self.operators = operators.copy()
+    def __init__(self, operator_list: List[str]):
+        super().__init__(operator_list)
         self.value: Optional[float] = None
-        self.fitness_value: Optional[float] = None
     
+    def set_gene_list(self, operators: List[str]):
+        super().set_gene_list(operators)
+        self.value = None
+
     def calculate_value(self, values: List[int]) -> None:
-        self.value = calculate_operation_result(self.operators, values)
+        self.value = calculate_operation_result(self.get_gene_list(), values)
         assert self.value is not None
-
-    def set_fitness_value(self, new_fitness_value: float) -> None:
-        assert new_fitness_value is not None
-        self.fitness_value = new_fitness_value
-
-    def set_new_operators(self, operators: List[str]):
-        assert operators is not None
-        self.operators = operators
 
     def get_value(self) -> float:
         if self.value is None:
-            raise ValueError()
+            raise ValueError("There is no value")
         return self.value
-
-    def get_fitness_value(self) -> float:
-        if self.fitness_value is None:
-            raise ValueError()
-        return self.fitness_value
-    
-    def get_operators(self) -> List[str]:
-        return self.operators.copy()
-    
-    def __lt__(self, other):
-        assert isinstance(other, Sequence)
-        return self.get_fitness_value() < other.get_fitness_value()
-
-    def __gt__(self, other):
-        assert isinstance(other, Sequence)
-        return self.get_fitness_value() > other.get_fitness_value()

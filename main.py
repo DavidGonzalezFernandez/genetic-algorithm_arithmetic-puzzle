@@ -1,4 +1,5 @@
 from typing import List
+from individual import Individual
 from sequence import Sequence, ARITHMETIC_OPERATORS
 import operators.crossover
 from operators.crossover import CrossoverOperator
@@ -20,14 +21,17 @@ selection_method: SelectionOperator = operators.selection.RankSelection
 crossover_operator: CrossoverOperator = operators.crossover.OnePointCrossOver
 mutation_operator: MutationOperator = operators.mutation.StringMutation
 
+# TODO: decouple
 def fitness_function(individual: Sequence):
     return abs(individual.get_value() - TARGET_VALUE)
 
+# TODO: decouple
 def evaluate_population(population: List[Sequence]) -> None:
     for elem in population:
         elem.calculate_value(VALUES)
         elem.set_fitness_value(fitness_function(elem))
 
+# TODO: decouple
 def generate_population() -> List[Sequence]:
     operators_per_sequence = len(VALUES)-1
     
@@ -40,8 +44,8 @@ def generate_population() -> List[Sequence]:
     return population
 
 
-def do_crossover(the_population: List[Sequence]) -> List[Sequence]:
-    offspring: List[Sequence] = []
+def do_crossover(the_population: List[Individual]) -> List[Individual]:
+    offspring: List[Individual] = []
 
     while len(the_population) >= 2:
         parent1 = the_population.pop()
@@ -55,14 +59,14 @@ def do_crossover(the_population: List[Sequence]) -> List[Sequence]:
     return offspring
 
 
-def mutate_population(the_population: List[Sequence]) -> None:
+def mutate_population(the_population: List[Individual]) -> None:
     for individual in the_population:
         mutation_operator.mutate(individual, MUTATION_P)
     
 
 def main():
     # Generate the initial population
-    population: List[Sequence] = generate_population()
+    population: List[Individual] = generate_population()
 
     # Evaluate the initial population
     evaluate_population(population)
@@ -71,10 +75,10 @@ def main():
 
     while n_generation<MAX_ITERATIONS  and  not any(individual.get_fitness_value()==0 for individual in population):
         # Reproduce (select) the best solutions within the population
-        selected_population: List[Sequence] = selection_method.select(population, MINIMIZE)
+        selected_population: List[Individual] = selection_method.select(population, MINIMIZE)
 
         # Crossover between the best solutions chosen (parents)
-        offspring: List[Sequence] = do_crossover(selected_population.copy())
+        offspring: List[Individual] = do_crossover(selected_population.copy())
 
         # Mutate generated children
         mutate_population(offspring)
