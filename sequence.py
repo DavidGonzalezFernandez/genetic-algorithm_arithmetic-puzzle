@@ -2,7 +2,7 @@ ARITHMETIC_OPERATORS = ["+", "-", "*", "/"]
 from typing import List, Optional
 from individual import Individual
 
-def __calculate_operation_result(
+def calculate_operation_result(
     operators: List[str], 
     values: List[int]
 ):
@@ -22,7 +22,7 @@ class Sequence(Individual):
         self.fitness_value: Optional[float] = None
     
     def calculate_value(self, values: List[int]) -> None:
-        self.value = __calculate_operation_result(self.operators, values)
+        self.value = calculate_operation_result(self.operators, values)
         assert self.value is not None
 
     def set_fitness_value(self, new_fitness_value: float) -> None:

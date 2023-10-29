@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from sequence import Individual
+from individual import Individual
 from typing import List, Optional, Dict
 import random
 

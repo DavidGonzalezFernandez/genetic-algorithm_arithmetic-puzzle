@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from sequence import Individual, ARITHMETIC_OPERATORS
+from individual import Individual
+from sequence import Sequence, ARITHMETIC_OPERATORS
 import random
 
 

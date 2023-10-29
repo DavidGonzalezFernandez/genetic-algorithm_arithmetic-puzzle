@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from .individual import Individual
 
 """Interface for individuals"""
 class Individual(ABC):

@@ -1,5 +1,5 @@
 from typing import List
-from sequence import Individual, Sequence, ARITHMETIC_OPERATORS
+from sequence import Sequence, ARITHMETIC_OPERATORS
 import operators.crossover
 from operators.crossover import CrossoverOperator
 import operators.mutation
@@ -16,7 +16,7 @@ CROSSOVER_P1 = 0.5
 MUTATION_P = 0.1
 MAX_ITERATIONS = 100
 
-selection_method: SelectionOperator = operators.selection.TournamentSelection
+selection_method: SelectionOperator = operators.selection.RankSelection
 crossover_operator: CrossoverOperator = operators.crossover.OnePointCrossOver
 mutation_operator: MutationOperator = operators.mutation.StringMutation
 
@@ -86,6 +86,6 @@ def main():
         # Evaluate the new population fitness
         evaluate_population(population)
 
-        
+
 if __name__ == "__main__":
     main()
