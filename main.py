@@ -1,5 +1,5 @@
 from typing import List
-from sequence import Sequence, ARITHMETIC_OPERATORS
+from sequence import Individual, Sequence, ARITHMETIC_OPERATORS
 import operators.crossover
 from operators.crossover import CrossoverOperator
 import operators.mutation
@@ -20,8 +20,8 @@ selection_method: SelectionOperator = operators.selection.TournamentSelection
 crossover_operator: CrossoverOperator = operators.crossover.OnePointCrossOver
 mutation_operator: MutationOperator = operators.mutation.StringMutation
 
-def fitness_function(sequence: Sequence):
-    return abs(sequence.get_value() - TARGET_VALUE)
+def fitness_function(individual: Sequence):
+    return abs(individual.get_value() - TARGET_VALUE)
 
 def evaluate_population(population: List[Sequence]) -> None:
     for elem in population:

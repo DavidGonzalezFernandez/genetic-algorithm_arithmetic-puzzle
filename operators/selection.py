@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from sequence import Sequence
+from sequence import Individual
 from typing import List, Optional, Dict
 import random
 
@@ -7,7 +7,7 @@ import random
 """Strategy interface for all selection operators"""
 class SelectionOperator(ABC):
     @abstractmethod
-    def select(self, population: List[Sequence], minimize: bool) -> List[Sequence]:
+    def select(self, population: List[Individual], minimize: bool) -> List[Individual]:
         raise NotImplemented()
 
 
@@ -15,14 +15,14 @@ class SelectionOperator(ABC):
 It is done systematically so that each solution is only chosen to participate in 2 tournaments."""
 class TournamentSelection(SelectionOperator):
     @staticmethod
-    def play_tournament(elem1: Sequence, elem2: Sequence, minimize: bool) -> Sequence:
+    def play_tournament(elem1: Individual, elem2: Individual, minimize: bool) -> Individual:
         if minimize:
             return min(elem1, elem2)
         else:
             return max(elem1, elem2)
 
     @staticmethod
-    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
+    def select(population: List[Individual], minimize: bool) -> List[Individual]:
         selected_population = []
 
         population1 = population.copy()
@@ -54,7 +54,7 @@ class TournamentSelection(SelectionOperator):
 
 class RouletteWheelSelection(SelectionOperator):
     @staticmethod
-    def __get_fitness_value_list(population: List[Sequence], alternative_fitness: Optional[List[float]] = None) -> Dict[int, float]:
+    def __get_fitness_value_list(population: List[Individual], alternative_fitness: Optional[List[float]] = None) -> Dict[int, float]:
         if alternative_fitness is None:
             return {i:individual.get_fitness_value() for (i,individual) in enumerate(population)}
         else:
@@ -81,8 +81,8 @@ class RouletteWheelSelection(SelectionOperator):
         return cumulative_probabilities
     
     @staticmethod
-    def __turn_wheel(population, selection_size, cumulative_probabilities, sum_probabilities) -> List[Sequence]:
-        selected: List[Sequence] = []
+    def __turn_wheel(population, selection_size, cumulative_probabilities, sum_probabilities) -> List[Individual]:
+        selected: List[Individual] = []
 
         for i in range(selection_size):
             p = random.random()*sum_probabilities
@@ -95,12 +95,12 @@ class RouletteWheelSelection(SelectionOperator):
 
 
     @staticmethod
-    def select(population: List[Sequence], minimize: bool, alternative_fitness: Optional[List[float]] = None, new_size: Optional[int] = None) -> List[Sequence]:
+    def select(population: List[Individual], minimize: bool, alternative_fitness: Optional[List[float]] = None, new_size: Optional[int] = None) -> List[Individual]:
         fitness_values: Dict[int, float] = RouletteWheelSelection.__get_fitness_value_list(population, alternative_fitness)
         probabilities: Dict[int, float] = RouletteWheelSelection.__get_probabilities(fitness_values, minimize)
         cumulative_probabilities: Dict[int, float] = RouletteWheelSelection.__get_cumulative_probabilities(probabilities)
 
-        selected: List[Sequence] = RouletteWheelSelection.__turn_wheel(
+        selected: List[Individual] = RouletteWheelSelection.__turn_wheel(
             population,
             new_size if new_size is not None else len(population),
             cumulative_probabilities,
@@ -112,18 +112,18 @@ class RouletteWheelSelection(SelectionOperator):
 
 class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
     @staticmethod
-    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
+    def select(population: List[Individual], minimize: bool) -> List[Individual]:
         # TODO
         pass
 
 class StochasticUniversalSampling(SelectionOperator):
     @staticmethod
-    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
+    def select(population: List[Individual], minimize: bool) -> List[Individual]:
         # TODO
         pass
 
 class RankSelection(SelectionOperator):
     @staticmethod
-    def select(population: List[Sequence], minimize: bool) -> List[Sequence]:
+    def select(population: List[Individual], minimize: bool) -> List[Individual]:
         # TODO
         pass

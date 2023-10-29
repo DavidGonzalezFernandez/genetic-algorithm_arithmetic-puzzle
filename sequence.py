@@ -1,10 +1,11 @@
 ARITHMETIC_OPERATORS = ["+", "-", "*", "/"]
 from typing import List, Optional
+from individual import Individual
 
-def calculate_operation_result(
-        operators: List[str], 
-        values: List[int]
-    ):
+def __calculate_operation_result(
+    operators: List[str], 
+    values: List[int]
+):
     assert len(operators) > 0
     assert len(operators)+1 == len(values)
 
@@ -14,14 +15,14 @@ def calculate_operation_result(
     
     return res
 
-class Sequence:
+class Sequence(Individual):
     def __init__(self, operators: List[str]):
         self.operators = operators.copy()
         self.value: Optional[float] = None
         self.fitness_value: Optional[float] = None
     
     def calculate_value(self, values: List[int]) -> None:
-        self.value = calculate_operation_result(self.operators, values)
+        self.value = __calculate_operation_result(self.operators, values)
         assert self.value is not None
 
     def set_fitness_value(self, new_fitness_value: float) -> None:

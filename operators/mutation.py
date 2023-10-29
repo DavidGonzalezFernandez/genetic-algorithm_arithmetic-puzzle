@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from sequence import Sequence, ARITHMETIC_OPERATORS
+from sequence import Individual, ARITHMETIC_OPERATORS
 import random
 
 
 """Strategy interface for all mutation operators"""
 class MutationOperator(ABC):
     @abstractmethod
-    def mutate(child: Sequence, pm: float) -> None:
+    def mutate(child: Individual, pm: float) -> None:
         raise NotImplemented()
 
 
