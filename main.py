@@ -16,18 +16,17 @@ OPERATOR_LIST_SIZE = len(VALUES)-1
 POPULATION_SIZE = OPERATOR_LIST_SIZE * 2
 TARGET_VALUE = 852
 MINIMIZE = True
-CROSSOVER_P1 = 0.5
 MUTATION_P = 0.1
 MAX_ITERATIONS = 100
 
 
 # TODO implement fixed and variable value
-m = POPULATION_SIZE // 2
+m = 8
 
 population_generator: PopulationGenerator = sequence.sequence_generator.RandomSequencePopulationGenerator
 individual_evaluator: IndividualEvaluator = sequence.sequence_evaluator.SequenceEvaluator(TARGET_VALUE, VALUES)
 selection_method: SelectionOperator = operators.selection.DeterministicSelector
-crossover_operator: CrossoverOperator = operators.crossover.OnePointRandomCrossOver
+crossover_operator: CrossoverOperator = operators.crossover.OnePointRandomCrossOver()
 mutation_operator: MutationOperator = operators.mutation.StringMutation
 
 # TODO: implement nicely
@@ -48,13 +47,13 @@ def do_crossover(the_population: List[Individual], crossover_threshold: float) -
 
     offspring: List[Individual] = []
 
-    while len(the_population) >= 0:
+    while len(the_population) > 0:
         parent1 = the_population.pop()
         parent2 = the_population.pop()
 
         # Threshold for crossover
         if random.random() <= crossover_threshold:
-            offspring.extend(crossover_operator.crossover(parent1, parent2, CROSSOVER_P1))
+            offspring.extend(crossover_operator.crossover(parent1, parent2))
         else:
             pass
             # TODO: check what to do in this case
