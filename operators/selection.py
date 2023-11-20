@@ -3,17 +3,16 @@ from individual import Individual
 from typing import List, Optional, Dict
 import random
 
-# TODO: implement probabilistic
-# TODO: implement deterministic
-# TODO: add M param
+# TODO: implement probabilistic according the classroom slides
 
 """Strategy interface for all selection operators"""
 class SelectionOperator(ABC):
     @abstractstaticmethod
-    def select(self, population: List[Individual], minimize: bool) -> List[Individual]:
+    def select(population: List[Individual], M:int, minimize: bool) -> List[Individual]:
         raise NotImplemented()
 
 
+# TODO: add M param
 """The selection method runs multiple 'tournaments' between 2 solutions and the best one is chosen.
 It is done systematically so that each solution is only chosen to participate in 2 tournaments."""
 class TournamentSelection(SelectionOperator):
@@ -55,6 +54,8 @@ class TournamentSelection(SelectionOperator):
         return selected_population
 
 
+# TODO: add M param
+# TODO: document
 class RouletteWheelSelection(SelectionOperator):
     @staticmethod
     def get_fitness_value_list(population: List[Individual], alternative_fitness: Optional[List[float]] = None) -> Dict[int, float]:
@@ -115,6 +116,8 @@ class RouletteWheelSelection(SelectionOperator):
         return selected
 
 
+# TODO: add M param
+# TODO: document
 class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
     @staticmethod
     def select(population: List[Individual], minimize: bool) -> List[Individual]:
@@ -146,6 +149,8 @@ class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
         return selection
 
 
+# TODO: add M param
+# TODO: document
 class StochasticUniversalSampling(SelectionOperator):
     @staticmethod
     def select(population: List[Individual], minimize: bool) -> List[Individual]:
@@ -168,6 +173,8 @@ class StochasticUniversalSampling(SelectionOperator):
         return selected
 
 
+# TODO: add M param
+# TODO: document
 class RankSelection(SelectionOperator):
     @staticmethod
     def select(population: List[Individual], minimize: bool) -> List[Individual]:
@@ -182,3 +189,13 @@ class RankSelection(SelectionOperator):
         assert len(selected) == len(population)
 
         return selected
+
+
+"""This deterministic selection method returns the m best individuals within the population"""
+class DeterministicSelector(SelectionOperator):
+    @staticmethod
+    def select(population: List[Individual], m:int, minimize: bool) -> List[Individual]:
+        assert 0 <= m <= len(population)
+        m_best_population = (sorted(population, reverse=(minimize)))[:m]
+        assert len(m_best_population) == m
+        return m_best_population
