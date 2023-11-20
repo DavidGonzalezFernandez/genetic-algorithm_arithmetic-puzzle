@@ -8,6 +8,7 @@ import random
 class RandomSequencePopulationGenerator(PopulationGenerator):
     @staticmethod
     def generate(operator_list_size: int, population_size: int) -> List[Sequence]:
+        assert operator_list_size > 0
         assert population_size > 0
         
         population: List[Sequence]  = [
