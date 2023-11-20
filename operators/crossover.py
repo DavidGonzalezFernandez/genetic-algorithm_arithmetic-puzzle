@@ -3,6 +3,9 @@ from individual import Individual
 from typing import List
 import random
 
+# TODO implement threshold for crossover
+# TODO implement OnePoint deterministic
+
 
 """Strategy interface for all crossover operators"""
 class CrossoverOperator(ABC):

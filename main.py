@@ -11,7 +11,8 @@ from operators.selection import SelectionOperator
 from population import PopulationGenerator
 
 VALUES = [75, 3, 1, 4, 50, 6, 12, 8]
-POPULATION_SIZE = (len(VALUES)-1) * 2
+OPERATOR_LIST_SIZE = len(VALUES)-1
+POPULATION_SIZE = OPERATOR_LIST_SIZE * 2
 TARGET_VALUE = 852
 MINIMIZE = True
 CROSSOVER_P1 = 0.5
@@ -55,8 +56,9 @@ def mutate_population(the_population: List[Individual]) -> None:
 
 """General structure for a genetic algorithm"""
 def main():
+    # TODO generar la población
     # Generate the initial population
-    population: List[Individual] = population_generator.generate(len(VALUES)-1, POPULATION_SIZE)
+    population: List[Individual] = population_generator.generate(OPERATOR_LIST_SIZE, POPULATION_SIZE)
 
     # Evaluate the initial population
     evaluate_population(population)
@@ -64,21 +66,22 @@ def main():
     n_generation = 0
 
     while n_generation<MAX_ITERATIONS  and  not any(individual.get_fitness_value()==0 for individual in population):
-        # Reproduce (select) the best solutions within the population
+        # TODO: Select the best solutions within the population
         selected_population: List[Individual] = selection_method.select(population, MINIMIZE)
 
-        # Crossover between the best solutions chosen (parents)
+        # TODO: Crossover between the best solutions chosen (parents)
         offspring: List[Individual] = do_crossover(selected_population.copy())
 
-        # Mutate generated children
+        # TODO Mutate generated children
         mutate_population(offspring)
 
-        # Update population list
+        # TODO Update population list (replacing the 'worst' with all the )
         population = offspring
-        n_generation += 1
 
         # Evaluate the new population fitness
         evaluate_population(population)
+
+        n_generation += 1
 
 
 if __name__ == "__main__":

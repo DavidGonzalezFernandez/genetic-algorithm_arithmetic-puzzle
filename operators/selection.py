@@ -3,6 +3,9 @@ from individual import Individual
 from typing import List, Optional, Dict
 import random
 
+# TODO: implement probabilistic
+# TODO: implement deterministic
+# TODO: add M param
 
 """Strategy interface for all selection operators"""
 class SelectionOperator(ABC):
