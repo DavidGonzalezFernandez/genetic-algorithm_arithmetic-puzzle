@@ -37,3 +37,6 @@ class Sequence(Individual):
 
     def clone(self, operator_list):
         return Sequence(operator_list)
+    
+    def __str__(self) -> str:
+        return f"{super().get_gene_list()} -> {super().get_fitness_value()}"
