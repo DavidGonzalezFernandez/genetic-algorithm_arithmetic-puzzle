@@ -20,6 +20,7 @@ def calculate_operation_result(
 class Sequence(Individual):
     def __init__(self, operator_list: List[str]):
         super().__init__(operator_list)
+        assert operator_list is not None
         self.value: Optional[float] = None
     
     def set_gene_list(self, operators: List[str]):
@@ -35,8 +36,8 @@ class Sequence(Individual):
             raise ValueError("There is no value")
         return self.value
 
-    def clone(self, operator_list):
-        return Sequence(operator_list)
+    def clone(self, operator_list=None):
+        return Sequence(operator_list if operator_list is not None else super().get_gene_list())
     
     def __str__(self) -> str:
         return f"{super().get_gene_list()} -> {super().get_fitness_value()}"
