@@ -5,6 +5,7 @@ from operators.mutation import MutationOperator
 from operators.selection import SelectionOperator
 from population import BestSelector
 import random
+import m_updater
 
 
 """Checks that the count for each Individual in the population is 1
@@ -74,10 +75,12 @@ def do_crossover(
     return offspring
 
 
+"""General structure for a genetic algorithm"""
 def run_simulation(
     population: List[Individual],
     MAX_ITERATIONS: int,
     m: int,
+    m_updater: m_updater.MUpdater,
     minimize: bool,
     individual_evaluator: IndividualEvaluator,
     selection_method: SelectionOperator,
@@ -90,6 +93,8 @@ def run_simulation(
     # Seed for reproducibility
     random.seed(0)
 
+    m_updater.set_initial_m(m)
+
     # Evaluate the initial population
     evaluate_population(population, individual_evaluator)
 
@@ -100,12 +105,13 @@ def run_simulation(
         assert m>0  and  m % 2 == 0
         assert len(population) % 2 == 0
 
-        # Select the best solutions within the population
+        # Select the best individuals within the population
         selected_population: List[Individual] = selection_method.select(population.copy(), m, minimize)
         check_only_instance(selected_population)
         assert len(selected_population) == m
+        assert len(selected_population) <= len(population)
 
-        # Crossover between the best solutions chosen (parents)
+        # Crossover between the best individuals chosen (parents)
         offspring: List[Individual] = do_crossover(selected_population.copy(), crossover_threshold, crossover_operator)
         check_only_instance(offspring)
         assert len(offspring) % 2 == 0
@@ -123,4 +129,5 @@ def run_simulation(
         evaluate_population(population, individual_evaluator)
 
         n_generation += 1
-        # TODO update M
+        m = m_updater.update_m()
+    print(f"\t{n_generation}")
