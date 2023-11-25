@@ -147,5 +147,5 @@ def run_simulation(
         f.write(f"crossover_operator={crossover_operator};")
         f.write(f"crossover_threshold={crossover_threshold};")
         f.write(f"mutation_threshold={mutation_threshold};")
-        f.write(f"best_selector={best_selector};")
+        f.write(f"best_selector={best_selector().__str__()};")
         f.write("\n")
