@@ -22,7 +22,6 @@ class OnePointDeterministicCrossOver(CrossoverOperator):
         operators1, operators2 = parent1.get_gene_list(), parent2.get_gene_list()
 
         assert len(operators1) == len(operators2)
-        assert 0 <= self.crossover_point <= len(operators1)
 
         children = [
             parent1.clone(operators1[:self.crossover_point] + operators2[self.crossover_point:]),
