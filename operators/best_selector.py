@@ -32,7 +32,6 @@ class BestProbabilisticSelector(BestSelector):
         if remove_size == len(population):
             return []
         
-        # TODO: check if OK
         fitness_values = {i:individual.get_fitness_value() for (i,individual) in enumerate(population)}
         if minimize:
             probabilities = {key:sum(fitness_values.values())/value for (key,value) in fitness_values.items()}
@@ -49,21 +48,19 @@ class BestProbabilisticSelector(BestSelector):
         assert 0 < remove_size < len(population)
         to_remove = set()
 
-        while len(to_remove) <= remove_size:
-            print("\t.")
+        while len(to_remove) < remove_size:
             # Calculate random number
-            p = random.random()*sum(fitness_values.values())
-            assert p>=0  and  p<=sum(fitness_values.values())
+            p = random.random()*sum(probabilities.values())
+            assert p>=0  and  p<=sum(probabilities.values())
 
-            # TODO: arreglar
             selected_individual = population[
                 next(k for (k,v) in cumulative_probabilities.items() if v>=p)
             ]
 
             to_remove.add(selected_individual)
-        # TODO: check if OK
         
         best_selected = [ind for ind in population if ind not in to_remove]
+        assert len(to_remove) == remove_size
         assert len(best_selected) + len(to_remove) == len(population)
 
         return best_selected
