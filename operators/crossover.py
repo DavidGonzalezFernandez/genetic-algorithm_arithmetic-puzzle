@@ -18,7 +18,6 @@ class OnePointDeterministicCrossOver(CrossoverOperator):
         assert crossover_point >= 0
         self.crossover_point: int = crossover_point
 
-    @staticmethod
     def crossover(self, parent1: Individual, parent2: Individual) -> List[Individual]:
         operators1, operators2 = parent1.get_gene_list(), parent2.get_gene_list()
 
