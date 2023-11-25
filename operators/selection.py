@@ -8,11 +8,10 @@ import random
 """Strategy interface for all selection operators"""
 class SelectionOperator(ABC):
     @abstractstaticmethod
-    def select(population: List[Individual], M:int, minimize: bool) -> List[Individual]:
+    def select(population: List[Individual], m:int, minimize: bool) -> List[Individual]:
         raise NotImplemented()
 
 
-# TODO: add M param
 """The selection method runs multiple 'tournaments' between 2 solutions and the best one is chosen.
 It is done systematically so that each solution is only chosen to participate in 2 tournaments."""
 class TournamentSelection(SelectionOperator):
@@ -24,7 +23,9 @@ class TournamentSelection(SelectionOperator):
             return max(elem1, elem2)
 
     @staticmethod
-    def select(population: List[Individual], minimize: bool) -> List[Individual]:
+    def select(population: List[Individual], m:int, minimize: bool) -> List[Individual]:
+        assert 0 <= m <= len(population)
+        
         selected_population = []
 
         population1 = population.copy()
@@ -32,7 +33,7 @@ class TournamentSelection(SelectionOperator):
 
         while len(population1) >= 2:
             selected_population.append(
-                TournamentSelection.play_tournament(population1.pop(), population1.pop(), minimize)
+                TournamentSelection.play_tournament(population1.pop(), population1.pop(), minimize).clone()
             )
 
         population2 = population.copy()
@@ -40,7 +41,7 @@ class TournamentSelection(SelectionOperator):
 
         while len(population2) >= 2:
             selected_population.append(
-                TournamentSelection.play_tournament(population2.pop(), population2.pop(), minimize)
+                TournamentSelection.play_tournament(population2.pop(), population2.pop(), minimize).clone()
             )
 
         assert len(population1) == len(population2)
@@ -48,13 +49,16 @@ class TournamentSelection(SelectionOperator):
         if population1:
             assert len(population1) == 1
             selected_population.append(
-                TournamentSelection.play_tournament(population1.pop(), population2.pop(), minimize)
+                TournamentSelection.play_tournament(population1.pop(), population2.pop(), minimize).clone()
             )
         
-        return selected_population
+        random.shuffle(selected_population)
+        m_selected = selected_population[:m]
+
+        assert len(m_selected) == m
+        return m_selected
 
 
-# TODO: add M param
 # TODO: document
 class RouletteWheelSelection(SelectionOperator):
     @staticmethod
@@ -88,39 +92,55 @@ class RouletteWheelSelection(SelectionOperator):
         return cumulative_probabilities
     
     @staticmethod
-    def turn_wheel(population, selection_size, cumulative_probabilities, sum_probabilities) -> List[Individual]:
+    def turn_wheel(population: List[Individual], selection_size, cumulative_probabilities, sum_probabilities) -> List[Individual]:
         selected: List[Individual] = []
 
         for i in range(selection_size):
             p = random.random()*sum_probabilities
             assert p>=0  and  p<=sum_probabilities
-            selected.append(population[next(k for (k,v) in cumulative_probabilities.items() if v>=p)])
+
+            # TODO: check and arreglar
+            selected.append(population[next(k for (k,v) in cumulative_probabilities.items() if v>=p)].clone())
         
         assert len(selected) == selection_size
 
         return selected
 
     @staticmethod
-    def select(population: List[Individual], minimize: bool, alternative_fitness: Optional[List[float]] = None, new_size: Optional[int] = None) -> List[Individual]:
+    def select(
+        population: List[Individual],
+        m: int, 
+        minimize: bool, 
+        alternative_fitness: Optional[List[float]] = None, 
+    ) -> List[Individual]:
+        if m == 0:
+            return []
+        
+        assert 0 < m <= len(population)
+
         fitness_values: Dict[int, float] = RouletteWheelSelection.get_fitness_value_list(population, alternative_fitness)
         probabilities: Dict[int, float] = RouletteWheelSelection.get_probabilities(fitness_values, minimize)
         cumulative_probabilities: Dict[int, float] = RouletteWheelSelection.get_cumulative_probabilities(probabilities)
 
         selected: List[Individual] = RouletteWheelSelection.turn_wheel(
             population,
-            new_size if new_size is not None else len(population),
+            m,
             cumulative_probabilities,
             sum(probabilities.values())    
         )
 
+        assert len(selected) == m
         return selected
 
 
-# TODO: add M param
 # TODO: document
 class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
     @staticmethod
-    def select(population: List[Individual], minimize: bool) -> List[Individual]:
+    def select(population: List[Individual], m: int, minimize: bool) -> List[Individual]:
+        if m == 0:
+            return []
+        assert 0 < m <= len(population)
+        
         fitness_values: Dict[int, float] = RouletteWheelSelection.get_fitness_value_list(population)
         probabilities: Dict[int, float] = RouletteWheelSelection.get_probabilities(fitness_values, minimize)
         multiplied_probabilities: Dict[int, float] = {k:v*len(population) for (k,v) in probabilities.items()}
@@ -131,7 +151,8 @@ class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
         remaining_fitness_values: List[float] = []
         for (k,v) in multiplied_probabilities.items():
             # Select copies according to integer part
-            selection.extend([population[k]]*int(v))
+            for repeat in range(int(v)):
+                selection.append(population[k].clone())
 
             # Fitness for new round (the non-integer part)
             non_integer_part = fitness_values[k] - int(fitness_values[k])
@@ -142,18 +163,33 @@ class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
         assert len(selection) <= len(population)
 
         if len(selection) < len(population):
-            selection.extend(RouletteWheelSelection.select(remaining_population, minimize, remaining_fitness_values, len(population)-len(selection)))
+            selection.extend(
+                RouletteWheelSelection.select(
+                    remaining_population, 
+                    len(population)-len(selection),
+                    minimize, 
+                    remaining_fitness_values
+                )
+            )
         
         assert len(selection) == len(population)
 
-        return selection
+        random.shuffle(selection)
+        selected_m = selection[:m]
+        assert len(selected_m) == m
+
+        return selected_m
 
 
-# TODO: add M param
 # TODO: document
 class StochasticUniversalSampling(SelectionOperator):
     @staticmethod
-    def select(population: List[Individual], minimize: bool) -> List[Individual]:
+    def select(population: List[Individual], m: int, minimize: bool) -> List[Individual]:
+        if m == 0:
+            return []
+        
+        assert 0 < m <= len(population)
+
         fitness_values: Dict[int, float] = RouletteWheelSelection.get_fitness_value_list(population)
         probabilities: Dict[int, float] = RouletteWheelSelection.get_probabilities(fitness_values, minimize)
         cumulative_probabilities: Dict[int, float] = RouletteWheelSelection.get_cumulative_probabilities(probabilities)
@@ -168,34 +204,49 @@ class StochasticUniversalSampling(SelectionOperator):
         for i in range(offspring_size):
             p = start + i/offspring_size
             assert 1 >= p >= 0
-            selected.append(population[next(k for (k,v) in cumulative_probabilities.items() if v>=p)])
 
-        return selected
+            # TODO: check and arreglar
+            selected.append(population[next(k for (k,v) in cumulative_probabilities.items() if v>=p)].clone())
+
+        random.shuffle(selected)
+        selected_m = selected[:m]
+        assert len(selected_m) == m
+
+        return selected_m
 
 
-# TODO: add M param
 # TODO: document
 class RankSelection(SelectionOperator):
     @staticmethod
-    def select(population: List[Individual], minimize: bool) -> List[Individual]:
-        sorted_population: List[Individual] = sorted(population)
-        if minimize:
-            sorted_population.reverse()
+    def select(population: List[Individual], m: int, minimize: bool) -> List[Individual]:
+        if m == 0:
+            return []
+        
+        assert 0 < m <= len(population)
+
+        sorted_population: List[Individual] = sorted(population, reverse=(not minimize))
+        assert (minimize and sorted_population.index(min(population))==0)  or  ((not minimize)  and  sorted_population.index(max(population))==0)
 
         fitness_values: Dict[int, float] = {i:(1+sorted_population.index(individual)) for (i,individual) in enumerate(population)}
 
-        selected: List[Individual] = RouletteWheelSelection.select(population, False, fitness_values, len(population))
+        selected_m: List[Individual] = RouletteWheelSelection.select(population, m, False, fitness_values)
 
-        assert len(selected) == len(population)
+        assert len(selected_m) == m
 
-        return selected
+        return selected_m
 
 
 """This deterministic selection method returns the m best individuals within the population"""
 class DeterministicSelector(SelectionOperator):
     @staticmethod
-    def select(population: List[Individual], m:int, minimize: bool) -> List[Individual]:
-        assert 0 <= m <= len(population)
-        m_best_population = (sorted(population, reverse=(minimize)))[:m]
+    def select(population: List[Individual], m: int, minimize: bool) -> List[Individual]:
+        if m == 0:
+            return []
+        assert 0 < m <= len(population)
+
+        m_best_population = (sorted(population, reverse=(not minimize)))[:m]
+        assert min(population) in m_best_population
+        assert (max(population) not in m_best_population)  or  (m==len(m_best_population))
+
         assert len(m_best_population) == m
         return m_best_population
