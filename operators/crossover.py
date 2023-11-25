@@ -1,4 +1,4 @@
-from abc import ABC, abstractstaticmethod
+from abc import ABC, abstractmethod
 from individual import Individual
 from typing import List
 import random
@@ -6,8 +6,11 @@ import random
 
 """Strategy interface for all crossover operators"""
 class CrossoverOperator(ABC):
-    @abstractstaticmethod
-    def crossover(parent1: Individual, parent2: Individual) -> List[Individual]:
+    @abstractmethod
+    def crossover(self, parent1: Individual, parent2: Individual) -> List[Individual]:
+        raise NotImplemented()
+    @abstractmethod
+    def __str__(self) -> str:
         raise NotImplemented()
 
 
@@ -32,6 +35,9 @@ class OnePointDeterministicCrossOver(CrossoverOperator):
         assert len(children[0].get_gene_list()) == len(children[1].get_gene_list()) == len(operators1)
 
         return children
+    
+    def __str__(self) -> str:
+        return "one_point_deterministic"
 
 
 """Concrete strategy for 1-point random crossover"""
@@ -51,6 +57,9 @@ class OnePointRandomCrossOver(CrossoverOperator):
         assert len(children[0].get_gene_list()) == len(children[1].get_gene_list())
 
         return children
+    
+    def __str__(self) -> str:
+        return "one_point_random"
 
 
 """Concrete strategy for 2-point random crossover"""
@@ -63,6 +72,9 @@ class TwoPointRandomCrossOver(CrossoverOperator):
         children = OnePointRandomCrossOver.crossover(child1, child2)
 
         return children
+    
+    def __str__(self) -> str:
+        return "two_point_random"
 
 
 """Concrete strategy for uniform random crossover"""
@@ -92,3 +104,6 @@ class UniformCrossover(CrossoverOperator):
         assert len(children[0].get_gene_list()) == len(children[1].get_gene_list())
 
         return children
+    
+    def __str__(self) -> str:
+        return "uniform"

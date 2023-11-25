@@ -1,4 +1,4 @@
-from abc import ABC, abstractstaticmethod
+from abc import ABC, abstractstaticmethod, abstractmethod
 from individual import Individual
 from sequence.sequence import ARITHMETIC_OPERATORS
 import random
@@ -8,6 +8,10 @@ import random
 class MutationOperator(ABC):
     @abstractstaticmethod
     def mutate(child: Individual, pm: float) -> None:
+        raise NotImplemented()
+    
+    @abstractstaticmethod
+    def __str__() -> str:
         raise NotImplemented()
 
 
@@ -21,3 +25,7 @@ class StringMutation(MutationOperator):
             new_operator = random.choice(ARITHMETIC_OPERATORS)
             operators[index] = new_operator
             individual.set_gene_list(operators)
+    
+    @staticmethod
+    def __str__(self) -> str:
+        return "string_mutation"

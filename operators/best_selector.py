@@ -21,6 +21,10 @@ class BestDeterministicSelector(BestSelector):
         assert len(selected) + remove_size == len(population)
 
         return selected
+    
+    @staticmethod
+    def __str__() -> str:
+        return "deterministic"
 
 
 # TODO: document
@@ -64,3 +68,7 @@ class BestProbabilisticSelector(BestSelector):
         assert len(best_selected) + len(to_remove) == len(population)
 
         return best_selected
+    
+    @staticmethod
+    def __str__() -> str:
+        return "probabilistic"

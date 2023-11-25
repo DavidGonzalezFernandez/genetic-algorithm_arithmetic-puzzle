@@ -10,6 +10,10 @@ class SelectionOperator(ABC):
     @abstractstaticmethod
     def select(population: List[Individual], m:int, minimize: bool) -> List[Individual]:
         raise NotImplemented()
+    
+    @abstractstaticmethod
+    def __str__() -> str:
+        raise NotImplemented
 
 
 """The selection method runs multiple 'tournaments' between 2 solutions and the best one is chosen.
@@ -58,6 +62,9 @@ class TournamentSelection(SelectionOperator):
         assert len(m_selected) == m
         return m_selected
 
+    @staticmethod
+    def __str__() -> str:
+        return "tournament"
 
 # TODO: document
 class RouletteWheelSelection(SelectionOperator):
@@ -137,6 +144,9 @@ class RouletteWheelSelection(SelectionOperator):
         assert len(selected) == m
         return selected
 
+    @staticmethod
+    def __str__() -> str:
+        return "roulette"
 
 # TODO: document
 class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
@@ -185,6 +195,9 @@ class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
 
         return selected_m
 
+    @staticmethod
+    def __str__() -> str:
+        return "roulette_stochastic"
 
 # TODO: document
 class StochasticUniversalSampling(SelectionOperator):
@@ -224,6 +237,9 @@ class StochasticUniversalSampling(SelectionOperator):
 
         return selected_m
 
+    @staticmethod
+    def __str__() -> str:
+        return "universal"
 
 # TODO: document
 class RankSelection(SelectionOperator):
@@ -245,6 +261,9 @@ class RankSelection(SelectionOperator):
 
         return selected_m
 
+    @staticmethod
+    def __str__() -> str:
+        return "rank"
 
 """This deterministic selection method returns the m best individuals within the population"""
 class DeterministicSelector(SelectionOperator):
@@ -260,3 +279,7 @@ class DeterministicSelector(SelectionOperator):
 
         assert len(m_best_population) == m
         return m_best_population
+
+    @staticmethod
+    def __str__() -> str:
+        return "deterministic"

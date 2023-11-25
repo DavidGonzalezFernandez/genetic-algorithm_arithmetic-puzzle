@@ -10,6 +10,9 @@ class MUpdater(ABC):
     @abstractmethod
     def update_m(self) -> int:
         raise NotImplemented()
+    @abstractmethod
+    def __str__(self) -> str:
+        raise NotImplemented()
     
 
 """It always outputs the same value for m"""
@@ -21,6 +24,8 @@ class MUpdaterConstantM(MUpdater):
         self.m = m
     def update_m(self) -> int:
         return self.m
+    def __str__(self) -> str:
+        return "constant_m"
 
 
 """Updates the m value multiplying it by an alpha value"""
@@ -35,3 +40,5 @@ class MUpdaterMultiplicative(MUpdater):
     def update_m(self) -> int:
         self.m_half = max(1, self.m_half * self.alpha)
         return int(self.m_half)*2
+    def __str__(self) -> str:
+        return f"multiplicative_{self.alpha}"

@@ -14,3 +14,7 @@ class BestSelector(ABC):
     @abstractstaticmethod
     def select_best(population: List[Individual], remove_size: int, minimize: bool) -> List[Individual]:
         raise NotImplemented()
+    
+    @abstractstaticmethod
+    def __str__() -> str:
+        raise NotImplemented()

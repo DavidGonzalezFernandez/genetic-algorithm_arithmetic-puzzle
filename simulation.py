@@ -7,6 +7,7 @@ from population import BestSelector
 import random
 import m_updater
 
+RESULT_FILE_PATH = "results/results.txt"
 
 """Checks that the count for each Individual in the population is 1
 If 2 Individuals are have the same values (==) they should not be the same reference (is)"""
@@ -94,13 +95,15 @@ def run_simulation(
     random.seed(0)
 
     m_updater.set_initial_m(m)
+    initial_m = m
 
     # Evaluate the initial population
     evaluate_population(population, individual_evaluator)
+    best_individual = min(population)
 
     n_generation = 0
 
-    while n_generation<MAX_ITERATIONS  and  not any(individual.get_fitness_value()==0 for individual in population):
+    while n_generation<MAX_ITERATIONS  and  not best_individual.get_fitness_value()==0:
         check_only_instance(population)
         assert m>0  and  m % 2 == 0
         assert len(population) % 2 == 0
@@ -130,4 +133,19 @@ def run_simulation(
 
         n_generation += 1
         m = m_updater.update_m()
-    print(f"\t{n_generation}")
+        best_individual = min(best_individual, min(population))
+        
+    # Save the results to file
+    with open(RESULT_FILE_PATH, "a") as f:
+        f.write(f"{n_generation};")
+        f.write(f"{best_individual.get_fitness_value()};")
+        f.write(f"{best_individual.get_gene_list()};")
+        f.write(f"population_size={len(population)};")
+        f.write(f"initial_m={initial_m};")
+        f.write(f"m_updater={m_updater};")
+        f.write(f"selection_method={m_updater};")
+        f.write(f"crossover_operator={crossover_operator};")
+        f.write(f"crossover_threshold={crossover_threshold};")
+        f.write(f"mutation_threshold={mutation_threshold};")
+        f.write(f"best_selector={best_selector};")
+        f.write("\n")
