@@ -3,7 +3,6 @@ from individual import Individual
 from typing import List, Optional, Dict
 import random
 
-# TODO: implement probabilistic according the classroom slides
 
 """Strategy interface for all selection operators"""
 class SelectionOperator(ABC):
@@ -66,7 +65,9 @@ class TournamentSelection(SelectionOperator):
     def __str__() -> str:
         return "tournament"
 
-# TODO: document
+
+"""Calculates 'm' random numbers in [0, 1] and selects the Individual whose cumulative probability
+correspond to the random number generated"""
 class RouletteWheelSelection(SelectionOperator):
     @staticmethod
     def get_fitness_value_list(population: List[Individual], alternative_fitness: Optional[List[float]] = None) -> Dict[int, float]:
@@ -148,7 +149,9 @@ class RouletteWheelSelection(SelectionOperator):
     def __str__() -> str:
         return "roulette"
 
-# TODO: document
+
+"""Each Individual is selected n times, where n is the integer part of the probability of being chosen
+times the expected population size. Then, for the remainders a Roulette-Wheel selection is performed"""
 class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
     @staticmethod
     def select(population: List[Individual], m: int, minimize: bool) -> List[Individual]:
@@ -199,7 +202,8 @@ class RouletteWheelSelection_StochasticRemainders(SelectionOperator):
     def __str__() -> str:
         return "roulette_stochastic"
 
-# TODO: document
+
+"""Chooses 1 initial value and in each iteration it adds turns the wheel by 1/m in each iteration for m iterations"""
 class StochasticUniversalSampling(SelectionOperator):
     @staticmethod
     def select(population: List[Individual], m: int, minimize: bool) -> List[Individual]:
@@ -213,14 +217,12 @@ class StochasticUniversalSampling(SelectionOperator):
         cumulative_probabilities: Dict[int, float] = RouletteWheelSelection.get_cumulative_probabilities(probabilities)
 
         # The start value is between 0 and P, where P is calculated as (total probabilities / offspring size)
-        offspring_size = len(population)
-
-        start = random.random() * (sum(probabilities.values()) / offspring_size)
+        start = random.random() * (sum(probabilities.values()) / m)
 
         selected: List[Individual] = []
 
-        for i in range(offspring_size):
-            p = start + i/offspring_size
+        for i in range(m):
+            p = start + i/m
             assert 1 >= p >= 0
 
             selected.append(
@@ -231,17 +233,16 @@ class StochasticUniversalSampling(SelectionOperator):
                 ].clone()
             )
 
-        random.shuffle(selected)
-        selected_m = selected[:m]
-        assert len(selected_m) == m
-
-        return selected_m
+        assert len(selected) == m
+        return selected
 
     @staticmethod
     def __str__() -> str:
         return "universal"
 
-# TODO: document
+
+"""Performs Roulette-Wheel selection with the fitness value of each Indivual being
+its index in the sorted population"""
 class RankSelection(SelectionOperator):
     @staticmethod
     def select(population: List[Individual], m: int, minimize: bool) -> List[Individual]:
@@ -264,6 +265,7 @@ class RankSelection(SelectionOperator):
     @staticmethod
     def __str__() -> str:
         return "rank"
+
 
 """This deterministic selection method returns the m best individuals within the population"""
 class DeterministicSelector(SelectionOperator):

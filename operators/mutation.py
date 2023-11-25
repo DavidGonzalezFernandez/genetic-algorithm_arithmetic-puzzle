@@ -15,17 +15,18 @@ class MutationOperator(ABC):
         raise NotImplemented()
 
 
-# TODO: document
+"""Changes one char in the gene_list"""
 class StringMutation(MutationOperator):
     @staticmethod
-    def mutate(individual: Individual, pm: float) -> None:
+    def mutate(individual: Individual, threshold: float) -> None:
         operators = individual.get_gene_list()
-        if random.random() <= pm:
+
+        if random.random() <= threshold:
             index = random.randint(0, len(operators)-1)
             new_operator = random.choice(ARITHMETIC_OPERATORS)
             operators[index] = new_operator
             individual.set_gene_list(operators)
     
     @staticmethod
-    def __str__(self) -> str:
+    def __str__() -> str:
         return "string_mutation"

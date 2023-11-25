@@ -4,7 +4,7 @@ import random
 from population import BestSelector
 
 
-# TODO: document
+"""Returns the population excluding the 'remove_size' worst ones."""
 class BestDeterministicSelector(BestSelector):
     @staticmethod
     def select_best(population: List[Individual], remove_size: int, minimize: bool) -> List[Individual]:
@@ -27,7 +27,9 @@ class BestDeterministicSelector(BestSelector):
         return "deterministic"
 
 
-# TODO: document
+"""Returns the population excluding the 'remove_size' individuals. The individuals with the worst 
+fitness values have a higher chance of being selected. Unlike in Roulette selection, this selector
+does not allow for duplicates"""
 class BestProbabilisticSelector(BestSelector):
     @staticmethod
     def select_best(population: List[Individual], remove_size: int, minimize: bool) -> List[Individual]:

@@ -9,6 +9,7 @@ class PopulationGenerator(ABC):
     def generate(list_size: int, population_size: int) -> List[Individual]:
         raise NotImplemented()
 
+
 """Strategy interface for all methods responsible to return the best individuals in a population"""
 class BestSelector(ABC):
     @abstractstaticmethod

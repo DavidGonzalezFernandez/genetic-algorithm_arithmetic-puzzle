@@ -13,12 +13,15 @@ import operators.best_selector
 import random
 import simulation, m_updater
 
+
 VALUES = [75, 3, 1, 4, 50, 6, 12, 8]
 OPERATOR_LIST_SIZE = len(VALUES)-1
 TARGET_VALUE = 852
 MINIMIZE = True
 MUTATION_P = 0.1
 MAX_ITERATIONS = 250
+N_REPEATS = 3
+
 
 population_generator: PopulationGenerator = sequence.sequence_generator.RandomSequencePopulationGenerator
 individual_evaluator: IndividualEvaluator = sequence.sequence_evaluator.SequenceEvaluator(TARGET_VALUE, VALUES)
@@ -47,11 +50,9 @@ m_updaters: List[m_updater.MUpdater] = \
 
 population_sizes = range(2, (OPERATOR_LIST_SIZE*2)+1, 2)
 
-N_REPEATS = 3
 
 def main():
     random.seed(10)
-    count = 0
 
     # Try different population sizes
     for population_size in population_sizes:
@@ -69,9 +70,6 @@ def main():
                                     for m in range(2, len(population)+1, 4):
                                         for m_updater in m_updaters:
 
-                                            count += 1
-                                            print(count)
-
                                             simulation.run_simulation(
                                                 population,
                                                 MAX_ITERATIONS,
@@ -86,7 +84,6 @@ def main():
                                                 mutation_prob,
                                                 best_selector
                                             )
-
 
 
 if __name__ == "__main__":
