@@ -99,8 +99,13 @@ class RouletteWheelSelection(SelectionOperator):
             p = random.random()*sum_probabilities
             assert p>=0  and  p<=sum_probabilities
 
-            # TODO: check and arreglar
-            selected.append(population[next(k for (k,v) in cumulative_probabilities.items() if v>=p)].clone())
+            selected.append(
+                population[
+                    next(   # The first one
+                        k for (k,v) in cumulative_probabilities.items() if v>=p     # Only those above the threshold
+                    )
+                ].clone()
+            )
         
         assert len(selected) == selection_size
 
@@ -205,8 +210,13 @@ class StochasticUniversalSampling(SelectionOperator):
             p = start + i/offspring_size
             assert 1 >= p >= 0
 
-            # TODO: check and arreglar
-            selected.append(population[next(k for (k,v) in cumulative_probabilities.items() if v>=p)].clone())
+            selected.append(
+                population[
+                    next(   # The first one
+                        k for (k,v) in cumulative_probabilities.items() if v>=p     # Only those above the threshold
+                    )
+                ].clone()
+            )
 
         random.shuffle(selected)
         selected_m = selected[:m]

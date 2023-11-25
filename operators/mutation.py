@@ -11,6 +11,7 @@ class MutationOperator(ABC):
         raise NotImplemented()
 
 
+# TODO: document
 class StringMutation(MutationOperator):
     @staticmethod
     def mutate(individual: Individual, pm: float) -> None:
