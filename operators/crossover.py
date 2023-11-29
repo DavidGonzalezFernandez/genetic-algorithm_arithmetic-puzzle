@@ -37,7 +37,7 @@ class OnePointDeterministicCrossOver(CrossoverOperator):
         return children
     
     def __str__(self) -> str:
-        return "one_point_deterministic"
+        return f"one_point_deterministic_{self.crossover_point}"
 
 
 """Concrete strategy for 1-point random crossover"""
