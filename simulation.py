@@ -7,7 +7,7 @@ from population import BestSelector
 import random
 import m_updater
 
-RESULT_FILE_PATH = "results/results.txt"
+RESULT_FILE_PATH = "results/"
 
 """Checks that the count for each Individual in the population is 1
 If 2 Individuals are have the same values (==) they should not be the same reference (is)"""
@@ -34,11 +34,11 @@ def replace_worst_with_offpring(
 def mutate_population(
     the_population: List[Individual],
     mutation_operator: MutationOperator,
-    mutation_threshold: float
+    mutation_probability: float
 )-> None:
-    assert 0 <= mutation_threshold <= 1
+    assert 0 <= mutation_probability <= 1
     for individual in the_population:
-        mutation_operator.mutate(individual, mutation_threshold)
+        mutation_operator.mutate(individual, mutation_probability)
 
 
 """Loops over the population and evaluates all the individuals,
@@ -54,11 +54,11 @@ def evaluate_population(
 """Loops over the the population and breeds the individuals"""
 def do_crossover(
     the_population: List[Individual], 
-    crossover_threshold: float, 
+    crossover_probability: float, 
     crossover_operator: CrossoverOperator
 ) -> List[Individual]:
     assert len(the_population) % 2 == 0
-    assert 0 <= crossover_threshold <= 1 
+    assert 0 <= crossover_probability <= 1 
 
     random.shuffle(the_population)
     offspring: List[Individual] = []
@@ -68,12 +68,41 @@ def do_crossover(
         parent2 = the_population.pop()
 
         # Threshold for crossover
-        if random.random() <= crossover_threshold:
+        if random.random() <= crossover_probability:
             children = crossover_operator.crossover(parent1, parent2)
             assert len(children) == 2
             offspring.extend(children)
     
     return offspring
+
+"""Save the results to file"""
+def write_results(
+    output_file_name: str,
+    n_generation: int, 
+    best_individual: Individual,
+    population: List[Individual],
+    initial_m: int,
+    selection_method: SelectionOperator,
+    crossover_operator: CrossoverOperator,
+    crossover_threshold: float,
+    mutation_operator: MutationOperator,
+    mutation_threshold: float,
+    best_selector: BestSelector
+):
+    with open(RESULT_FILE_PATH + output_file_name, "a") as f:
+        f.write(f"{n_generation};")
+        f.write(f"{best_individual.get_fitness_value()};")
+        f.write(f"{best_individual.get_gene_list()};")
+        f.write(f"population_size={len(population)};")
+        f.write(f"initial_m={initial_m};")
+        f.write(f"m_updater={m_updater};")
+        f.write(f"selection_method={selection_method().__str__()};")
+        f.write(f"crossover_operator={crossover_operator};")
+        f.write(f"crossover_threshold={crossover_threshold};")
+        f.write(f"mutation_threshold={mutation_threshold};")
+        f.write(f"best_selector={best_selector().__str__()};")
+        f.write("\n")
+
 
 
 """General structure for a genetic algorithm"""
@@ -90,11 +119,15 @@ def run_simulation(
     mutation_operator: MutationOperator,
     mutation_threshold: float,
     best_selector: BestSelector,
+    output_file_name: str = "results.txt"
 ):
     # Seed for reproducibility
     random.seed(0)
 
+    # Initialize the m_updater
     m_updater.set_initial_m(m)
+
+    # Copy of the initial m
     initial_m = m
 
     # Evaluate the initial population
@@ -124,7 +157,7 @@ def run_simulation(
         mutate_population(offspring, mutation_operator, mutation_threshold)
         check_only_instance(offspring)
 
-        # Update population list (replacing the 'worst' with all the new children)
+        # Update population list replacing the 'worst' with all the new children
         population = replace_worst_with_offpring(population, offspring, minimize, best_selector)
         check_only_instance(population)
 
@@ -134,18 +167,19 @@ def run_simulation(
         n_generation += 1
         m = m_updater.update_m()
         best_individual = min(best_individual, min(population))
-        
-    # Save the results to file
-    with open(RESULT_FILE_PATH, "a") as f:
-        f.write(f"{n_generation};")
-        f.write(f"{best_individual.get_fitness_value()};")
-        f.write(f"{best_individual.get_gene_list()};")
-        f.write(f"population_size={len(population)};")
-        f.write(f"initial_m={initial_m};")
-        f.write(f"m_updater={m_updater};")
-        f.write(f"selection_method={m_updater};")
-        f.write(f"crossover_operator={crossover_operator};")
-        f.write(f"crossover_threshold={crossover_threshold};")
-        f.write(f"mutation_threshold={mutation_threshold};")
-        f.write(f"best_selector={best_selector().__str__()};")
-        f.write("\n")
+
+
+    # Write the results
+    write_results(
+        output_file_name,
+        n_generation, 
+        best_individual, 
+        population, 
+        initial_m, 
+        selection_method, 
+        crossover_operator, 
+        crossover_threshold, 
+        mutation_operator, 
+        mutation_threshold, 
+        best_selector
+    )

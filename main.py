@@ -20,8 +20,7 @@ TARGET_VALUE = 852
 MINIMIZE = True
 MUTATION_P = 0.1
 MAX_ITERATIONS = 250
-N_REPEATS = 3
-
+N_REPEATS = 5
 
 population_generator: PopulationGenerator = sequence.sequence_generator.RandomSequencePopulationGenerator
 individual_evaluator: IndividualEvaluator = sequence.sequence_evaluator.SequenceEvaluator(TARGET_VALUE, VALUES)
@@ -31,45 +30,50 @@ selection_methods: List[SelectionOperator] = [
     operators.selection.DeterministicSelector
 ]
 
-crossover_operators: List[CrossoverOperator] = \
-    [operators.crossover.OnePointRandomCrossOver()] + [operators.crossover.OnePointDeterministicCrossOver(i) for i in range(OPERATOR_LIST_SIZE+1, 2)]
-
+crossover_operators: List[CrossoverOperator] = [
+    operators.crossover.OnePointRandomCrossOver(),
+    operators.crossover.OnePointDeterministicCrossOver(OPERATOR_LIST_SIZE//2)
+]
 
 mutation_operators: List[MutationOperator] = [
     operators.mutation.StringMutation
 ]
 
 best_selectors: List[BestSelector] = [
+    operators.best_selector.BestProbabilisticSelector,
     operators.best_selector.BestDeterministicSelector,
-    operators.best_selector.BestProbabilisticSelector
 ]
 
-m_updaters: List[m_updater.MUpdater] = \
-    [m_updater.MUpdaterConstantM(), m_updater.MUpdaterMultiplicative(0.999), m_updater.MUpdaterMultiplicative(0.99), m_updater.MUpdaterMultiplicative(0.95)]
-
+m_updaters: List[m_updater.MUpdater] = [
+    m_updater.MUpdaterConstantM(), 
+    m_updater.MUpdaterMultiplicative(0.9999), 
+    m_updater.MUpdaterMultiplicative(0.999), 
+    m_updater.MUpdaterMultiplicative(0.99),
+    m_updater.MUpdaterMultiplicative(0.95)
+]
 
 population_sizes = range(2, (OPERATOR_LIST_SIZE*2)+1, 2)
 
 
 def main():
-    random.seed(10)
+    # Repeat n_repeats times
+    for repeat in range(N_REPEATS):
+        seed = repeat
+        random.seed(seed)
 
-    # Try different population sizes
-    for population_size in population_sizes:
+        # Try different population sizes
+        for population_size in population_sizes:
 
-        # Repeat for each size N_REPEATS times
-        for repeat in range(N_REPEATS):
             population: List[Individual] = population_generator.generate(OPERATOR_LIST_SIZE, population_size)
 
             for selection_method in selection_methods:
                 for crossover_operator in crossover_operators:
-                    for crossover_threshold in [i/5 for i in range(1, 6)]:
+                    for crossover_threshold in [i/5 for i in range(6)]:
                         for mutation_operator in mutation_operators:
                             for mutation_prob in [i/5 for i in range(6)]:
                                 for best_selector in best_selectors:
-                                    for m in range(2, len(population)+1, 4):
+                                    for m in range(2, len(population)+1, 2):
                                         for m_updater in m_updaters:
-
                                             simulation.run_simulation(
                                                 population,
                                                 MAX_ITERATIONS,
@@ -82,7 +86,8 @@ def main():
                                                 crossover_threshold,
                                                 mutation_operator,
                                                 mutation_prob,
-                                                best_selector
+                                                best_selector,
+                                                output_file_name = f"results_{seed}.txt"
                                             )
 
 
